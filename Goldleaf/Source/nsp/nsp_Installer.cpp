@@ -283,7 +283,7 @@ namespace nsp
             
             ncmContentStorageDeletePlaceHolder(&this->cnt_storage, &placehld_id);
             ERR_RC_TRY(ncmContentStorageCreatePlaceHolder(&this->cnt_storage, &cnt_id, &placehld_id, content_file_size));
-            NcaWriter writer(placehld_id, &this->cnt_storage);
+            NcaWriter writer(cnt_id, placehld_id, &this->cnt_storage);
             u64 cur_written_size = 0;
             u64 rem_size = content_file_size;
             auto content_path = "Contents/temp/" + content_file_name;

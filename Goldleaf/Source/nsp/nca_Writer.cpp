@@ -1,4 +1,5 @@
 #include <nsp/nca_Writer.hpp>
+#include <err/err_Result.hpp>
 #include <zstd.h>
 #include <string.h>
 
@@ -148,7 +149,7 @@ protected:
 };
 
 
-NcaBodyWriter::NcaBodyWriter(const NcmNcaId& ncaId, u64 offset, NcmContentStorage* contentStorage) : m_contentStorage(contentStorage), m_ncaId(ncaId), m_offset(offset)
+NcaBodyWriter::NcaBodyWriter(const NcmPlaceHolderId& placeHoldId, u64 offset, NcmContentStorage* contentStorage) : m_contentStorage(contentStorage), m_placeHoldId(placeHoldId), m_offset(offset)
 {
 }
 
@@ -160,7 +161,7 @@ u64 NcaBodyWriter::write(const  u8* ptr, u64 sz)
 {
      if(isOpen())
      {
-          ncm::WritePlaceHolder(m_contentStorage, &m_ncaId, m_offset, (void*)ptr, sz);
+          ncmContentStorageWritePlaceHolder(m_contentStorage, &m_placeHoldId, m_offset, (void*)ptr, sz);
           m_offset += sz;
           return sz;
      }
@@ -256,7 +257,7 @@ protected:
 class NczBodyWriter : public NcaBodyWriter
 {
 public:
-     NczBodyWriter(const NcmNcaId& ncaId, u64 offset, NcmContentStorage* contentStorage) : NcaBodyWriter(ncaId, offset, contentStorage)
+     NczBodyWriter(const NcmPlaceHolderId& placeHoldId, u64 offset, NcmContentStorage* contentStorage) : NcaBodyWriter(placeHoldId, offset, contentStorage)
      {
           buffIn = malloc(buffInSize);
           buffOut = malloc(buffOutSize);
@@ -305,7 +306,7 @@ public:
 
           if (m_deflateBuffer.size())
           {
-               ncm::WritePlaceHolder(m_contentStorage, &m_ncaId, m_offset, m_deflateBuffer.data(), m_deflateBuffer.size());
+               ncmContentStorageWritePlaceHolder(m_contentStorage, &m_placeHoldId, m_offset, m_deflateBuffer.data(), m_deflateBuffer.size());
                m_offset += m_deflateBuffer.size();
                m_deflateBuffer.resize(0);
           }
@@ -465,7 +466,7 @@ public:
      std::vector<NczHeader::SectionContext*> sections;
 };
 
-NcaWriter::NcaWriter(const NcmNcaId& ncaId, NcmContentStorage* contentStorage) : m_ncaId(ncaId), m_contentStorage(contentStorage), m_writer(NULL)
+NcaWriter::NcaWriter(const NcmContentId& contentId, NcmPlaceHolderId& placeHoldId, NcmContentStorage* contentStorage) : m_contentId(contentId), m_placeHoldId(placeHoldId), m_contentStorage(contentStorage), m_writer(NULL)
 {
 }
 
@@ -484,8 +485,8 @@ bool NcaWriter::close()
      {
           if(isOpen())
           {
-			   ncm::CreatePlaceHolder(m_contentStorage, &m_ncaId, &m_ncaId, m_buffer.size());
-			   ncm::WritePlaceHolder(m_contentStorage, &m_ncaId, 0, m_buffer.data(), m_buffer.size());
+               ERR_RC_TRY(ncmContentStorageCreatePlaceHolder(m_contentStorage, &m_contentId, &m_placeHoldId, m_buffer.size()));
+               ERR_RC_TRY(ncmContentStorageWritePlaceHolder(m_contentStorage, &m_placeHoldId, 0, m_buffer.data(), m_buffer.size()));
           }
 
           m_buffer.resize(0);
@@ -529,7 +530,7 @@ u64 NcaWriter::write(const  u8* ptr, u64 sz)
                {
                     if(isOpen())
                     {
-                         ncm::CreatePlaceHolder(m_contentStorage, &m_ncaId, &m_ncaId, header.nca_size);
+                         ncmContentStorageCreatePlaceHolder(m_contentStorage, &m_contentId, &m_placeHoldId, header.nca_size);
                     }
                }
                else
@@ -539,7 +540,7 @@ u64 NcaWriter::write(const  u8* ptr, u64 sz)
 
                if(isOpen())
                {
-                    ncm::WritePlaceHolder(m_contentStorage, &m_ncaId, 0, m_buffer.data(), m_buffer.size());
+                    ncmContentStorageWritePlaceHolder(m_contentStorage, &m_placeHoldId, 0, m_buffer.data(), m_buffer.size());
                }
           }
      }
@@ -552,11 +553,11 @@ u64 NcaWriter::write(const  u8* ptr, u64 sz)
                {
                     if (*(u64*)ptr == NczHeader::MAGIC)
                     {
-                         m_writer = std::shared_ptr<NcaBodyWriter>(new NczBodyWriter(m_ncaId, m_buffer.size(), m_contentStorage));
+                         m_writer = std::shared_ptr<NcaBodyWriter>(new NczBodyWriter(m_placeHoldId, m_buffer.size(), m_contentStorage));
                     }
                     else
                     {
-                         m_writer = std::shared_ptr<NcaBodyWriter>(new NcaBodyWriter(m_ncaId, m_buffer.size(), m_contentStorage));
+                         m_writer = std::shared_ptr<NcaBodyWriter>(new NcaBodyWriter(m_placeHoldId, m_buffer.size(), m_contentStorage));
                     }
                }
                else
