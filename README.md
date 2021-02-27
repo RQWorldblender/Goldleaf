@@ -1,8 +1,6 @@
 # Goldleaf
 
-[![LatestVer](https://img.shields.io/github/release-pre/xortroll/goldleaf.svg)](https://github.com/XorTroll/Goldleaf/releases/latest) [![Releases](https://img.shields.io/github/downloads/xortroll/goldleaf/total.svg)](https://github.com/XorTroll/Goldleaf/releases/latest) ![License](https://img.shields.io/badge/License-GPLv3-blue.svg) **(thanks for 1M downloads 💜)**
-
-> Goldleaf is multipurpose homebrew tool for Nintendo Switch.
+> Goldleaf is multipurpose homebrew tool for Nintendo Switch. This fork includes support for browsing and installing NSZ files, based on code from blawar's fork GoldBricks.
 
 <img src="Screenshots/Goldleaf.1.jpg" alt="drawing" width="250"/> <img src="Screenshots/Goldleaf.2.jpg" alt="drawing" width="250"/> <img src="Screenshots/Goldleaf.3.jpg" alt="drawing" width="250"/>
 
@@ -21,14 +19,6 @@
 7. [Credits and support](#credits-and-support)
 
 > Having any issues? Check [our FAQ](docs/FAQ.md) for help!
-
-## **[Download it from here!](https://github.com/XorTroll/Goldleaf/releases)**
-
-<p>
-<a href="https://www.patreon.com/xortroll"><img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" height="50" width="220"></a>
-<br>
-<b>Do you like my work? Become a patron and support it!</b>
-</p>
 
 ## Features
 
@@ -56,7 +46,7 @@
 
     - Basic directory operations: create, delete, copy, rename, (un)set archive bit, get full size
 
-    - Install NSP packages as applications/games, updates, etc. (**note: THIS INVOLVES BAN RISK!**)
+    - Install NSP and NSZ packages as applications/games, updates, etc. (**note: THIS INVOLVES BAN RISK!**)
 
     - Launch other NRO homebrews
 
@@ -150,15 +140,19 @@
 
 ## Disclaimer
 
-### NSP installs
+### NSZ support
 
-Always keep in mind that installing NSP packages can be a very easy way to get banned. If you use airplane mode and special DNSs like 90DNS, there is a smaller chance to get banned.
+The upstream author (XorTroll) has no plans to include the NSZ support found in this fork upstream, due to the format potentially turning this software into a piracy tool. **Do not open issues or pull requests, or ask the upstream author to include this NSZ support. It will certainly be rejected.**
 
-**NEVER** install untrusted NSPs. Goldleaf doesn't do any special verification, so please be very careful about installing untrusted packages.
+### NSP and NSZ installs
+
+Always keep in mind that installing NSP or NSZ packages can be a very easy way to get banned. If you use airplane mode and special DNSs like 90DNS, there is a smaller chance to get banned.
+
+**NEVER** install untrusted NSPs or NSZs. Goldleaf doesn't do any special verification, so please be very careful about installing untrusted packages.
 
 ### Tickets
 
-Tickets represent a game purchase - technically speaking, you can't launch a title if the ticket isn't present and the title requires it (official titles require them). NSP packages which don't have (nor require) a ticket are standard-crypto.
+Tickets represent a game purchase - technically speaking, you can't launch a title if the ticket isn't present and the title requires it (official titles require them). NSP or NSZ packages which don't have (nor require) a ticket are standard-crypto.
 
 Goldleaf will display whether a ticket is present or not, and if so, it's titlekey. Titlekeys are required to decrypt and access a title's content. Otherwise, they are undecryptable, hence unlaunchable by the system.
 
@@ -241,7 +235,7 @@ Read this before making any new translations:
 
 ### Credits
 
-The main concepts of Goldleaf are and have been developed by me (XorTroll), but without the effort and support of many others, this project wouldn't have been a thing:
+The main concepts of Goldleaf are and have been developed by XorTroll, but without the effort and support of many others, this project wouldn't have been a thing:
 
 - Adubbz and all the (old) [Tinfoil](https://github.com/Adubbz/Tinfoil) contributors, for their huge work with title installing.
 
@@ -258,6 +252,8 @@ The main concepts of Goldleaf are and have been developed by me (XorTroll), but 
 - shchmue for the system to get tickets from system save data without breaking anything, found in [Lockpick](https://github.com/shchmue/Lockpick).
 
 - WerWolv for the help with custom exception handling, avoiding those frustrating fatals.
+
+- blawar for the NSZ support, from his fork [GoldBricks](https://github.com/blawar/goldbricks).
 
 - Translators: [unbranched](https://github.com/unbranched) and [exelix](https://github.com/exelix11) for Italian, [tiliarou](https://github.com/tiliarou), [FuryBaguette](https://github.com/FuryBaguette) and GOffrier#9688 for French, and [LoOkYe](https://github.com/lookye) and C4Phoenix for German.
 
