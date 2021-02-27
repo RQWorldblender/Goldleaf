@@ -20,6 +20,7 @@
 */
 
 #include <nsp/nsp_Installer.hpp>
+#include <nsp/nca_Writer.hpp>
 #include <err/err_Result.hpp>
 #include <fs/fs_FileSystem.hpp>
 #include <sys/stat.h>
@@ -282,6 +283,7 @@ namespace nsp
             
             ncmContentStorageDeletePlaceHolder(&this->cnt_storage, &placehld_id);
             ERR_RC_TRY(ncmContentStorageCreatePlaceHolder(&this->cnt_storage, &cnt_id, &placehld_id, content_file_size));
+            NcaWriter writer(placehld_id, &this->cnt_storage);
             u64 cur_written_size = 0;
             u64 rem_size = content_file_size;
             auto content_path = "Contents/temp/" + content_file_name;
@@ -311,6 +313,7 @@ namespace nsp
                         break;
                 }
                 ERR_RC_TRY(ncmContentStorageWritePlaceHolder(&this->cnt_storage, &placehld_id, cur_written_size, tmp_buf, tmp_read_size));
+                writer.write(tmp_buf, tmp_read_size);
                 cur_written_size += tmp_read_size;
                 rem_size -= tmp_read_size;
                 auto time_post = std::chrono::steady_clock::now();
@@ -328,6 +331,7 @@ namespace nsp
                     pfs0_file.GetExplorer()->EndFile(fs::FileMode::Read);
                     break;
             }
+            writer.close();
             total_written_size += cur_written_size;
             ERR_RC_TRY(ncmContentStorageRegister(&this->cnt_storage, &cnt_id, &placehld_id));
             ncmContentStorageDeletePlaceHolder(&this->cnt_storage, &placehld_id);

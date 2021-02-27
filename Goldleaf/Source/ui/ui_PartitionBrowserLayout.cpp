@@ -111,7 +111,7 @@ namespace ui
                 else
                 {
                     auto ext = LowerCaseString(fs::GetExtension(itm));
-                    if(ext == "nsp") mitm->SetIcon(global_settings.PathForResource("/FileSystem/NSP.png"));
+                    if(ext == "nsp" || ext == "nsz") mitm->SetIcon(global_settings.PathForResource("/FileSystem/NSP.png"));
                     else if(ext == "nro") mitm->SetIcon(global_settings.PathForResource("/FileSystem/NRO.png"));
                     else if(ext == "tik") mitm->SetIcon(global_settings.PathForResource("/FileSystem/TIK.png"));
                     else if(ext == "cert") mitm->SetIcon(global_settings.PathForResource("/FileSystem/CERT.png"));
@@ -186,7 +186,7 @@ namespace ui
         {
             auto ext = LowerCaseString(fs::GetExtension(item));
             auto msg = cfg::strings::Main.GetString(52) + " ";
-            if(ext == "nsp") msg += cfg::strings::Main.GetString(53);
+            if(ext == "nsp" || ext == "nsz") msg += cfg::strings::Main.GetString(53);
             else if(ext == "nro") msg += cfg::strings::Main.GetString(54);
             else if(ext == "tik") msg += cfg::strings::Main.GetString(55);
             else if(ext == "nxtheme") msg += cfg::strings::Main.GetString(56);
@@ -198,7 +198,7 @@ namespace ui
             const auto is_bin = this->gexp->IsFileBinary(fullitm);
             std::vector<String> vopts;
             u32 copt = 5;
-            if(ext == "nsp")
+            if(ext == "nsp" || ext == "nsz")
             {
                 vopts.push_back(cfg::strings::Main.GetString(65));
                 copt++;
@@ -246,7 +246,7 @@ namespace ui
             auto sopt = global_app->CreateShowDialog(cfg::strings::Main.GetString(76), msg, vopts, true);
             if(sopt < 0) return;
             int osopt = sopt;
-            if(ext == "nsp")
+            if(ext == "nsp" || ext == "nsz")
             {
                 switch(sopt)
                 {
@@ -507,7 +507,7 @@ namespace ui
             {
                 auto path = fullitm + "/" + file;
                 auto ext = LowerCaseString(fs::GetExtension(path));
-                if(ext == "nsp") nsps.push_back(file);
+                if(ext == "nsp" || ext == "nsz") nsps.push_back(file);
             }
             std::vector<String> extraopts = { cfg::strings::Main.GetString(281) };
             if(!nsps.empty()) extraopts.push_back(cfg::strings::Main.GetString(282));
