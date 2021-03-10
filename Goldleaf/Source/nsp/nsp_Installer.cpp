@@ -127,7 +127,7 @@ namespace nsp
         this->cnt_meta_key = cnmt.GetContentMetaKey();
         ERR_RC_UNLESS(!hos::ExistsTitle(ncm::ContentMetaType::Any, Storage::SdCard, this->cnt_meta_key.id), err::result::ResultTitleAlreadyInstalled);
         ERR_RC_UNLESS(!hos::ExistsTitle(ncm::ContentMetaType::Any, Storage::NANDUser, this->cnt_meta_key.id), err::result::ResultTitleAlreadyInstalled);
-        
+
         bool has_cnmt_installed = false;
         ERR_RC_TRY(ncmContentStorageHas(&this->cnt_storage, &has_cnmt_installed, &record.ContentId));
         if(!has_cnmt_installed) this->ncas.push_back(record);
@@ -264,11 +264,26 @@ namespace nsp
             auto cnt_id = cnt.ContentId;
             auto content_file_name = hos::ContentIdAsString(cnt_id);
             if(cnt.Type == ncm::ContentType::Meta) content_file_name += ".cnmt";
-            content_file_name += ".nca";
-            auto content_file_idx = this->pfs0_file.GetFileIndexByName(content_file_name);
-            ERR_RC_UNLESS(PFS0::IsValidFileIndex(content_file_idx), err::result::ResultInvalidNSP);
-            total_size += pfs0_file.GetFileSize(content_file_idx);
-            content_file_idxs.push_back(content_file_idx);
+
+            auto content_file_idx = this->pfs0_file.GetFileIndexByName(content_file_name + ".nca");
+            auto content_file_idxz = this->pfs0_file.GetFileIndexByName(content_file_name + ".ncz");
+
+            if(PFS0::IsValidFileIndex(content_file_idx))
+            {
+                content_file_name += ".nca";
+                total_size += pfs0_file.GetFileSize(content_file_idx);
+                content_file_idxs.push_back(content_file_idx);
+            }
+            else if(PFS0::IsValidFileIndex(content_file_idxz))
+            {
+                content_file_name += ".ncz";
+                total_size += pfs0_file.GetFileSize(content_file_idxz);
+                content_file_idxs.push_back(content_file_idxz);
+            }
+            else
+            {
+                return err::result::ResultInvalidNSP;
+            }
         }
         for(u32 i = 0; i < this->ncas.size(); i++)
         {
@@ -280,7 +295,7 @@ namespace nsp
 
             NcmPlaceHolderId placehld_id = {};
             memcpy(placehld_id.uuid.uuid, cnt_id.c, 0x10);
-            
+
             ncmContentStorageDeletePlaceHolder(&this->cnt_storage, &placehld_id);
             ERR_RC_TRY(ncmContentStorageCreatePlaceHolder(&this->cnt_storage, &cnt_id, &placehld_id, content_file_size));
             NcaWriter writer(cnt_id, placehld_id, &this->cnt_storage);
